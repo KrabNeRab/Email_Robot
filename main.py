@@ -21,10 +21,11 @@ class DataBaseConnector:
         return conn
 
 class ExcelGeneration:
-    def __init__(self, data, cursor):
+    def __init__(self, data, cursor, file_name):
         self.data = data
         self.cursor = cursor
-
+        self.file_name = file_name
+    
     def generation_excel(self):
 
         wb = openpyxl.Workbook()
@@ -37,8 +38,8 @@ class ExcelGeneration:
         #Добавляем данные с базы
         for row in self.data:
             sheet.append(list(row))
-        wb.save('выгрузка_по_отправлениям_l-post.xlsx')
-        return 'выгрузка_по_отправлениям_l-post.xlsx'
+        wb.save(self.file_name)
+        return self.file_name
 
 
 
@@ -79,7 +80,7 @@ def send_email():
     data = cursor.fetchall()
 
 
-    generator = ExcelGeneration(data, cursor)
+    generator = ExcelGeneration(data, cursor, 'file_name.xlsx')
     attachment = generator.generation_excel()
 
     sender = EmailSender(config.email_sender, sql_queries.email_recipient, sql_queries.email_subject, attachment, config.smtp_server, config.smtp_port, config.email_password)
