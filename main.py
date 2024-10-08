@@ -16,7 +16,7 @@ class DataBaseConnector:
         self.server = server
         self.database = database
 
-    def connectioin(self):
+    def connection(self):
         conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+self.server+';DATABASE='+self.database+';Trusted_Connection=yes')
         return conn
 
@@ -74,7 +74,7 @@ class EmailSender:
 
 def send_email():
     connector = DataBaseConnector(config.sql_server, config.DataBase)
-    conn = connector.connectioin()
+    conn = connector.connection()
     cursor = conn.cursor()
     cursor.execute(sql_queries.sql_query)
     data = cursor.fetchall()
