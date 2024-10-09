@@ -72,32 +72,40 @@ class EmailSender:
         server.quit()
 
 
-def send_email():
-    connector = DataBaseConnector(config.sql_server, config.DataBase)
-    conn = connector.connection()
-    cursor = conn.cursor()
-    cursor.execute(sql_queries.sql_query)
-    data = cursor.fetchall()
+class NewsLetters:
+    def __init__(self, sql_server, DataBase, sql_query, email_sender, email_recipient, email_subject, smtp_server, smtp_port, email_password, file_name):
+        self.sql_server = sql_server
+        self.DataBase = DataBase
+        self.sql_query = sql_query
+        self.email_sender = email_sender
+        self.email_recipient = email_recipient
+        self.email_subject = email_subject
+        self.smtp_server = smtp_server
+        self.smtp_port = smtp_port
+        self.email_password = email_password
+        self.file_name = file_name
+
+    def start(self):
+        connector = DataBaseConnector(self.sql_server, self.DataBase)
+        conn = connector.connection()
+        cursor = conn.cursor()
+        cursor.execute(self.sql_query)
+        data = cursor.fetchall()
+
+        generator = ExcelGeneration(data, cursor, self.file_name)
+        attachment = generator.generation_excel()
+
+        sender = EmailSender(self.email_sender, self.email_recipient, self.email_subject, attachment, self.smtp_server, self.smtp_port, self.email_password)
+        sender.send_email()
 
 
-    generator = ExcelGeneration(data, cursor, 'file_name.xlsx')
-    attachment = generator.generation_excel()
+email = NewsLetters(config.sql_server, config.DataBase, sql_queries.sql_query, config.email_sender, sql_queries.email_recipient, sql_queries.email_subject, config.smtp_server, config.smtp_port, config.email_password, sql_queries.file_name)
+email.start()
 
-    sender = EmailSender(config.email_sender, sql_queries.email_recipient, sql_queries.email_subject, attachment, config.smtp_server, config.smtp_port, config.email_password)
-    sender.send_email()
-
-
-
-#раз в минуту будет отправляться письмо
-def testing():
-    schedule.every(1).minutes.do(send_email)
-
-testing()
 
 while True:
     schedule.run_pending()
     time.sleep(1)
-
 
 
 
