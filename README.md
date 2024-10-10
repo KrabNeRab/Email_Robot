@@ -8,7 +8,7 @@ sql_queries:
 
 сonfig:
 1)smtp_server
-2)smtp_port
+2)smtp_port (порт ставим 25)
 3)sql_server
 4)DataBase (название бд)
 5)email_sender (отправитель)
